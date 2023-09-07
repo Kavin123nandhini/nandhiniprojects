@@ -1,0 +1,78 @@
+<!-- my-network.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include any necessary CSS and JavaScript libraries here -->
+</head>
+<body>
+    <h1>Search Results</h1>
+
+    <!-- This is the HTML element where we will display the search results -->
+    <ul id="search-results">
+    </ul>
+
+    <!-- Your search form here -->
+    <form class="search-form" method="get">
+        <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4">
+            <div class="input-group">
+                <input type="search" id="search-data" placeholder="search friends by name, emirates, email, or phone number" aria-describedby="button-addon1" class="form-control border-0 bg-light">
+                <div class="input-group-append">
+                    <button id="button-addon1" type="submit" class="btn btn-link"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Include jQuery (if not already included) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Your JavaScript code for handling the search form and AJAX request -->
+    <script>
+        $(document).ready(function () {
+            // Listen for the form submission
+            $('.search-form').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var query = $('#search-data').val(); // Get the search query from the input field
+
+                // Send an AJAX GET request to your search endpoint
+                $.ajax({
+                    url: '/app-feed/search-friends/', // Replace with your actual search endpoint
+                    type: 'GET',
+                    data: { 'q': query }, // Pass the query parameter
+                    dataType: 'json',
+                    success: function (data) {
+                        // Function to update the search results
+                        function updateSearchResults(results) {
+                            var searchResultsList = $('#search-results');
+                            searchResultsList.empty(); // Clear previous results
+
+                            if (results.length === 0) {
+                                searchResultsList.append('<li>No results found</li>');
+                            } else {
+                                // Loop through the results and add them to the list
+                                for (var i = 0; i < results.length; i++) {
+                                    var result = results[i];
+                                    var listItem = '<li>' +
+                                        '<strong>ID:</strong> ' + result.id + '<br>' +
+                                        '<strong>Name:</strong> ' + result.name + '<br>' +
+                                        '<strong>Email:</strong> ' + result.email +
+                                        '</li>';
+                                    searchResultsList.append(listItem);
+                                }
+                            }
+                        }
+
+                        // Call the function to update search results
+                        updateSearchResults(data.results);
+                    },
+                    error: function () {
+                        console.error('Error occurred during the search.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!--identify_user Modal-->
+{%load static %}
+<div id="add-contact" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span type="button" onclick="javascript:window.location.reload()" class="close" data-dismiss="modal" aria-hidden="true">&times;</span>
+<!--            <span onclick="document.getElementById('login_1').style.display='none'"-->
+<!--                  class="close" title="Close">&times;</span>-->
+            <!-- <img src="images/signin1.jpg" alt="Avatar" class="avatar"> -->
+          <h2> <a  href="{% url 'home' %}" class="sitename">
+              <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+            </a></h2>
+        </div>
+
+        <div class=" modal-body ">
+            <form id="search-form" class="search-form">
+
+            <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4">
+            <div class="input-group">
+              <input type="search" id="search-data" name="search" placeholder="search friends by name,emirates,email,or phonenumber" aria-describedby="button-addon1" class="form-control border-0 bg-light">
+              <div class="input-group-append">
+                <button id="button-addon1" type="submit" class="btn btn-link "><i class="fa fa-search"></i></button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+<div class="row invitations p-2" id="search-results">
+<!--  <div class="col-lg-12" >-->
+<!--      <div class="row">-->
+<!--          <div class="col-sm-2 ">-->
+<!--              <iconify-icon class="icon" icon="mdi:user-circle" ></iconify-icon>-->
+<!--          </div>-->
+<!--          <div class="col-lg-4" >-->
+<!--                           <h5>hi {{data.name}}</h5>-->
+<!--                              <p>{{user.university}}&nbsp;&nbsp;{{user.work_company}}</p>-->
+<!--                           <p>{{data.email}}</p>-->
+<!--                               <p>{{user.emirates_office}}</p>-->
+
+<!--          </div>-->
+<!--          <div class="col-lg-3 mb-3">-->
+<!--              <a href="#" class="btn red-button">Connect</a>-->
+<!--          </div>-->
+
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="clearfix"></div>-->
+<!--         <hr />-->
+<!--      </div>-->
+</div>
+</div>
+</div>
+</div>
+
+    <!-- Include jQuery (you can use other libraries or vanilla JS if preferred) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).on('submit','#search-form',function(e)
+     {
+  // Prevent the default form submission
+  e.preventDefault();
+ // alert("submit search");
+ // Serialize the form data
+ var formData = $('#search-data').val();
+  console.log("search by:",formData);
+// Send an AJAX request to the Django view
+$.ajax({
+    type: 'GET',  // You can also use 'POST' if needed
+    url:"{% url 'search-friends' %}", // Replace with your search view URL
+    data: {
+    formData:formData,
+    },
+    dataType: 'json',
+    success: function (data) {
+        console.log(data);
+        function updateSearchResults(results) {
+                    var searchResultsList = $('#search-results');
+                    let inputs = '';
+                    searchResultsList.empty(); // Clear previous results
+
+                    if (results.length === 0) {
+                        searchResultsList.append('<li>No results found</li>');
+                    } else {
+                        // Loop through the results and add them to the list
+                    for (var i = 0; i < results.length; i++) {
+                      var result = results[i];
+                       inputs +=
+                                 '<div class="col-lg-12">'+
+                                   '<div class="row">'+
+                                    '<div class="col-sm-2 ">'+
+                                  '<iconify-icon class="icon" icon="mdi:user-circle" ></iconify-icon>'+
+                              '</div>'+
+                              '<div class="col-lg-4">'+
+                                              '<h5>'+ result.name + '</h5>'+
+                                                  '<p>'+ result.email + '</p>'+
+                              '</div>'+
+                             ' <div class="col-lg-3 mb-3">'+
+                                  '<a href="{% url 'add-friend' %}?id='+ result.id + '" class="btn red-button">Connect</a>'+
+                              '</div>'+
+                               '</div>'+
+                              '</div>'+
+                               '<div class="clearfix"></div>'+'<hr/>'+'</div>';
+                             }
+                             //forloop -end
+                        searchResultsList.html(inputs);
+                    }
+                }
+
+                // Call the function to update search results
+                updateSearchResults(data.results);
+            },
+            error: function () { console.error('Error occurred during the search.');}
+});
+});
+
+</script>
+
+

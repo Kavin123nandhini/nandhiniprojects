@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom CSS for the profile card */
+        .profile-card {
+            width: 300px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .profile-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background-color: #007bff;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .profile-name,
+        .profile-email {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .edit-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="profile-card">
+                    <div class="profile-image">
+                        <span>JD</span> <!-- Initials or an image can be placed here -->
+                    </div>
+                    <div class="profile-name">
+                        <span id="name">John Doe</span>
+                        <input type="text" id="edit-name" class="form-control edit-input" value="John Doe">
+                    </div>
+                    <div class="profile-email">
+                        <span id="email">john.doe@example.com</span>
+                        <input type="email" id="edit-email" class="form-control edit-input" value="john.doe@example.com">
+                    </div>
+                    <button id="edit-button" class="btn btn-primary">Edit</button>
+                    <button id="save-button" class="btn btn-success edit-input">Save</button>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <!-- Main content of your webpage goes here -->
+                <h1>Welcome to My Website</h1>
+                <p>This is the main content of your webpage.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // JavaScript for editing user info
+        const editButton = document.getElementById('edit-button');
+        const saveButton = document.getElementById('save-button');
+        const nameSpan = document.getElementById('name');
+        const emailSpan = document.getElementById('email');
+        const editNameInput = document.getElementById('edit-name');
+        const editEmailInput = document.getElementById('edit-email');
+
+        editButton.addEventListener('click', () => {
+            nameSpan.style.display = 'none';
+            emailSpan.style.display = 'none';
+            editNameInput.style.display = 'block';
+            editEmailInput.style.display = 'block';
+            saveButton.style.display = 'block';
+            editButton.style.display = 'none';
+        });
+
+        saveButton.addEventListener('click', () => {
+            const newName = editNameInput.value;
+            const newEmail = editEmailInput.value;
+
+            nameSpan.textContent = newName;
+            emailSpan.textContent = newEmail;
+
+            nameSpan.style.display = 'block';
+            emailSpan.style.display = 'block';
+            editNameInput.style.display = 'none';
+            editEmailInput.style.display = 'none';
+            saveButton.style.display = 'none';
+            editButton.style.display = 'block';
+        });
+    </script>
+</body>
+</html>

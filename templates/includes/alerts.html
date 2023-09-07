@@ -1,0 +1,19 @@
+{%load static %}
+{% if messages %}
+  {% for message in messages %}
+<div  id="alert1" class="modal-box">
+
+    <div class="modal-content animate" >
+        <div class="container-head">
+            <h2 class="text-center mt-3"> <a class="sitename" href="{% url 'home' %}">
+                <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+            </a></h2>
+            <p class="alert-text center p-3">{{message|safe }}</p>
+        </div>
+             <p class="text-center btn red-button mt-4"
+                onclick="document.getElementById('alert1').style.display='none'">
+            Ok</p>
+    </div>
+</div>
+{% endfor %}
+{% endif %}

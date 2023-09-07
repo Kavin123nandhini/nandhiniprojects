@@ -1,0 +1,332 @@
+{% extends 'title.html' %}
+{%load static %}
+{% block title %} Registration{% endblock %}
+{% block body %}
+{%load static %}
+<div class="container ">
+    <div class="row register justify-content-center p-3 align-items-center">
+        <div class="col-md-6 border animate">
+     <form action="{% url 'user-register' %}"  enctype="multipart/form-data" method="post">
+                  {% csrf_token %}
+
+        <div class="modal-header ">
+<!--            <span type="button" onclick="javascript:window.location.reload()" class="close" data-dismiss="modal" aria-hidden="true">&times;</span>-->
+            <!-- <img src="images/signin1.jpg" alt="Avatar" class="avatar"> -->
+          <h2 class="center"> <a class="sitename " href="{% url 'home' %}">
+                <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+            </a></h2>
+        </div>
+          <input type="hidden" name="user_role" value="{{user_role}}">
+        <div class="modal-body ">
+            <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="first_name">Your name<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                        <input type="text" id="first_name"
+                               placeholder="Your first name"
+                               name="first_name"
+                               class="form-control" minlength="3" maxlength="50" required>
+                    </div>
+                  </div>
+                </div>
+           <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="last_name">Last name<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                        <input type="text" id="last_name"
+                               placeholder="Your Last name"
+                               name="last_name"
+                               class="form-control" required>
+                    </div>
+                  </div>
+                </div>
+            <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="last_name">Emirates id<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                        <input type="text" id="emirates_id"
+                               placeholder="Emirates ID"
+                               name="emirates_id"
+                               class="form-control" required>
+                    </div>
+                  </div>
+                </div>
+                <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="email">Email<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7 ">
+                    <div class="form-group">
+                      <input type="email" id="email" placeholder="Your email" name="email" required  class="form-control">
+                    </div>
+                  </div>
+                </div>
+                <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="password1">Login password<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                      <input type="password" id="password1" placeholder="Ex:User@123" name="password" required
+                             pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at 8 characters long" maxlength="8" size="8"class="form-control">
+                    </div>
+                       <span id="passwordMessage1"></span>
+                  </div>
+                </div>
+            <div class="row pb-3">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="conform-password">Retype password<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7 ">
+                    <div class="form-group">
+                      <input type="password" id="conform-password" placeholder="Ex:User@123" name="password"  onkeyup="conform_password_validate()" required
+                             pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at 8 characters long" maxlength="8" size="8"class="form-control">
+                    </div>
+                      <span id="passwordMessage"></span>
+                  </div>
+                </div>
+
+                <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label ">
+                      <lable for="phone">Phone<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7 ">
+                    <div class="form-group">
+                      <input type="text" name="phone"  placeholder="mobile number" size="10" class="form-control" required/>
+                    </div>
+                  </div>
+                </div>
+             <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <label for="emirates_name">Emirates(office)<span class="high-light"> *</span></label>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                        <select id="emirates_name" name="emirates_name" required>
+                          <option selected>-- select emirate--</option>
+                          <option value="Abu Dhabi">Abu Dhabi</option>Ajman
+                            <option value="Ajman">Ajman</option>
+                          <option value="Dubai">Dubai</option>
+                            <option value="Fujairah">Fujairah</option>
+                            <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                          <option value="Sharjah">Sharjah</option>
+                            <option value="Umm Al-Quwain">Umm Al-Quwain</option>
+                        </select>
+                    </div>
+                  </div>
+                </div>
+<!--            qualification and skills for freshers and experience-->
+            {% if user_role == 'Fresher' or user_role == 'Experienced' %}
+             <div class="row  pb-3 ">
+                  <div class="col-md-5 col-form-label">
+                      <label for="gender">Gender<span class="high-light"> *</span></label>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                      <div class="form-check form-check-inline ">
+                        <input class=" form-check-input" type="radio" name="gender" id="femaleGender" value="Female"  required >
+                        <label class="form-check-label" for="femaleGender">Female</label>
+                      </div>
+                      <div class="form-check form-check-inline ">
+                        <input class=" form-check-input" type="radio" name="gender" id="maleGender" value="Male">
+                        <label class="form-check-label" for="maleGender">Male</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            <div class="row  pb-3">
+                  <div class="col-md-5 col-form-label">
+                      <lable for="qualification">Qualification<span class="high-light"> *</span></lable>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="form-group">
+                      <input type="text" id="qualification" placeholder="Qualification" name="qualification" required  class="form-control">
+                    </div>
+                  </div>
+                </div>
+            <div class="row   pb-3">
+                        <div class="col-md-5 col-form-label">
+                            <label for="fresher_skills">Skills<span class="high-light"> *</span></label>
+                        </div>
+                        <div class="col-md-7">
+                          <div class="form-group">
+                              <textarea  class="address form-control" rows="4" cols="50"  id="fresher_skills"
+                              placeholder="Describe your skills within 500 words" name="skills" maxlength="1000" required  ></textarea>
+                          </div>
+                        </div>
+                      </div>
+            {% endif %}
+            <!--company name for both employer and experience-->
+             {% if user_role == 'Employer' or user_role == 'Experienced' %}
+             <div class="row  pt-3 pb-3">
+                        <div class="col-md-5 col-form-label">
+                            <label for="work_company">Company Name<span class="high-light"> *</span></label>
+                        </div>
+                        <div class="col-md-7">
+                          <div class="form-group">
+                            <input type="text" id="work_company" placeholder="Current working company name " name="work_company"  class="form-control" maxlength="500" required >
+                          </div>
+                        </div>
+                      </div>
+               {% endif %}
+<!--                    getting details of experience or user-->
+<!--                   getting fresher details-->
+            {% if user_role == 'Fresher' %}
+                      <div class="row pt-3 pb-3">
+                        <div class="col-md-5 col-form-label ">
+                            <lable for="university">University<span class="high-light"> *</span></lable>
+                        </div>
+                        <div class="col-md-7 ">
+                          <div class="form-group">
+                            <input type="text" id="university" placeholder="University last studied " name="university"
+                                    maxlength="500" class="form-control" required >
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row   pb-3">
+                        <div class="col-md-5 col-form-label">
+                            <lable for="passed_year">Year passed out<span class="high-light"> *</span></lable>
+                        </div>
+                        <div class="col-md-7 ">
+                          <div class="form-group">
+                            <input type="text" id="passed_year" placeholder="Year of passed out " name="passed_year"
+                                   maxlength="4"   pattern="\d{4}" class="form-control" required >
+                          </div>
+                        </div>
+                      </div>
+
+
+<!--                    getting experience details-->
+            {% elif user_role == 'Experienced' %}
+                      <div class="row pt-3 pb-3">
+                        <div class="col-md-5 col-form-label ">
+                            <lable for="designation">Designation<span class="high-light"> *</span></lable>
+                        </div>
+                        <div class="col-md-7 ">
+                          <div class="form-group">
+                            <input type="text" id="designation" placeholder="Your designation " name="designation" required  class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row  pt-3 pb-3">
+                        <div class="col-md-5 col-form-label">
+                            <lable for="work_exp_years">Total Number of Experience<span class="high-light"> *</span></lable>
+                        </div>
+                        <div class="col-md-7 ">
+                          <div class="form-group">
+                            <input type="number" id="work_exp_years" placeholder="Working experience " name="work_exp_years" required  class="form-control" min="1" max="100" >
+                          </div>
+                        </div>
+                      </div>
+
+            {% elif user_role == 'Employer' %}
+<!--                    getting employer details-->
+                      <div class="row pt-3 pb-3">
+                        <div class="col-md-5 col-form-label ">
+                            <lable for="employee_count">Company Size<span class="high-light"> *</span></lable>
+                        </div>
+                        <div class="col-md-7 ">
+                          <div class="form-group">
+                            <input type="number" id="employee_count" placeholder="Total number of employees " required name="employee_count"  class="form-control" min="1" max="100000">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row   pb-3">
+                        <div class="col-md-5 col-form-label">
+                            <lable for="work_exp_years">Authorized person name<span class="high-light"> *</span></lable>
+                        </div>
+                        <div class="col-md-7 ">
+                          <div class="form-group">
+                            <input type="text" id="auth_name" placeholder="Authorized name " name="auth_name" required  class="form-control" >
+                          </div>
+                        </div>
+                      </div>
+                <div class="row   pb-3">
+                        <div class="col-md-5 col-form-label">
+                            <label for="about_company">About Company<span class="high-light"> *</span></label>
+                        </div>
+                        <div class="col-md-7">
+                          <div class="form-group">
+                              <textarea  class="address form-control" rows="4" cols="50"  id="about_company"
+                              placeholder="Describe your skills within 500 words" name="about_company" maxlength="1000" required  ></textarea>
+                          </div>
+                        </div>
+                      </div>
+            {% endif %}
+<!--                   getting details end-->
+        </div>
+                <div class="btnouter">
+                    <div class="btndisplay">
+                        <button type="submit" id="submitButton" class="btn red-button">Register</button>
+                    </div>
+                    <div class="btndisplay">
+                      <a class="btn white-button" href="{% url 'home' %}">Cancel</a>
+                    </div>
+                </div>
+
+
+    </form>
+ </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+    //Password length and character check
+function validate_password(){
+var password1 = document.getElementById("password1").value;
+const passwordMessage = document.getElementById('passwordMessage1');
+let regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+let result = regex.test(password1);
+
+if(!result){
+passwordMessage.textContent = 'Must contain at least one number and one uppercase and lowercase, and 8 characters long ';
+                passwordMessage.style.color = 'red';
+                submitButton.disabled = true;
+
+}
+else{
+                passwordMessage.textContent = '';
+                submitButton.disabled = false;
+}
+}
+ document.getElementById("password1").addEventListener('input', validate_password);
+
+//Confirm password check
+
+function conform_password_validate(){
+var password1 = document.getElementById("password1").value;
+var conformPassword = document.getElementById("conform-password").value;
+const passwordMessage = document.getElementById('passwordMessage');
+const submitButton = document.getElementById('submitButton');
+
+      if((password1 === conformPassword) && (password1!="" && conformPassword!=""))
+      {
+
+       passwordMessage.textContent = 'Passwords match';
+          passwordMessage.style.color = 'green';
+
+        submitButton.disabled = false;
+      }
+      else {
+                passwordMessage.textContent = 'Passwords do not match';
+                passwordMessage.style.color = 'red';
+
+                submitButton.disabled = true;
+      }
+    }
+
+
+
+
+</script>
+
+
+{% endblock body %}

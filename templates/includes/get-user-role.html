@@ -1,0 +1,66 @@
+<!--identify_user Modal-->
+{%load static %}
+<div id="identify_user" class="modal">
+    <div class="modal-content justify-content-center align-items-center">
+        <div class="  modal-header">
+            <span type="button" onclick="javascript:window.location.reload()" class="close" data-dismiss="modal" aria-hidden="true">&times;</span>
+<!--            <span onclick="document.getElementById('login_1').style.display='none'"-->
+<!--                  class="close" title="Close">&times;</span>-->
+            <!-- <img src="images/signin1.jpg" alt="Avatar" class="avatar"> -->
+          <h2> <a  href="{% url 'home' %}" class="sitename">
+              <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+            </a></h2>
+        </div>
+
+        <div class=" modal-body ">
+            <div class="row  pt-3 pb-3">
+                   <div class="col-lg-12 compress-option" >
+         <h3 class="mb-4 center ">Please help us to identify yourself</h3>
+
+        <!--    1.Fresher-->
+            <div class="form-check pb-3 pt-3 ">
+
+              <input class=" mx-2 form-check-input" type="radio" name="user_option"
+                  id="Fresher" value="Fresher" >
+              <label  for="Fresher">Student / Fresher</label>
+
+            </div >
+<!--    2.Experienced-->
+            <div class="form-check pb-3 pt-3 ">
+
+                      <input class=" mx-2 form-check-input" type="radio" name="user_option"
+                                  id="experienced" value="Experienced" >
+                            <label  for="experienced">Working Professional</label>
+
+            </div>
+<!--    Employer-->
+            <div class="form-check pb-3 pt-3 ">
+                  <input class=" mx-2 form-check-input" type="radio" name="user_option"
+                              id="employer" value="Employer" >
+                 <label  for="employer">Employer / Consultancy</label>
+            </div>
+<form id="role-form" method="post" action="{% url 'user-role' %}">
+        {% csrf_token %}
+        <input type="hidden" name="user_role" id="selected-role">
+    </form>
+ </div>
+</div>
+        </div>
+        </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+    $("input[name='user_option']").on("click", function(){
+               //alert("clicked");
+                //e.preventDefault();
+                var selectedRole = $(this).val();
+               // alert(selectedRole);
+                $('#selected-role').val(selectedRole);
+                $('#role-form').submit();
+            });
+        });
+    </script>
+</div>

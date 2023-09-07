@@ -1,0 +1,44 @@
+{% load user_filter %}
+              <div class="card ">
+                <div class="card-header">
+                    <h3>Applied List</h3>
+                </div>
+
+                  <div class="row invitations p-2">
+            {% for request in applied_users %}
+
+                      <div class="col-lg-12">
+                          <div class="row">
+                       <div class="col-lg-">
+                           <h5>{{ request.applied_user.username }}</h5>
+                              {% with user_registration=request.applied_user|user_profile %}
+    {% if user_registration %}
+       Working company name: {{ user_registration.work_company }}<br>
+       Experience: {{ user_registration.exp_years }}<br>
+       Qualification: {{ user_registration.qualification }}<br>
+       skills: {{ user_registration.skills }}
+    {% else %}
+        <!-- Handle the case when the user_registration is None or not found -->
+    {% endif %}
+{% endwith %}
+              </div>
+                      <div class="col-lg- mb-3 mt-3">
+                          <a href="{% url 'accept-result' request.id %}" class="btn red-button">Accept</a>
+                      </div>
+                      <div class="col-lg- mb-3">
+                          <a href="{% url 'ignore-result' request.id %}" class="btn white-button">Ignore</a>
+                      </div>
+                                <div class="col-lg- mb-3">
+                          <a href="{% url 'hold-result' request.id %}" class="btn white-button">Hold</a>
+                      </div>
+                        </div>
+                      </div>
+                      <div class="clearfix"></div>
+                     <hr />
+
+{% endfor %}
+
+                  </div>
+            </div >
+
+
