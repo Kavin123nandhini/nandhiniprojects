@@ -1,16 +1,17 @@
 <!-- view_friends.html -->
 
 
-
+{%load static %}
+{% load user_filter %}
 
 
               <div class="card ">
                 <div class="card-header">
                     <h3>Contacts</h3>
                 </div>
-
+                 {% if friends %}
                   <div class="row invitations p-2">
-    {% for friend in friends %}
+                    {% for friend in friends %}
                       <div class="col-lg-12">
                           <div class="row">
                       <div class="col-sm-2 ">
@@ -18,17 +19,27 @@
                       </div>
                        <div class="col-lg-4">
                            <h5> {{ friend.friend.username }}</h5>
-                               <p>abc Engineering collage</p>
-              </div>
+   {% with user_registration=friend.friend.id|user_profile %}
+    {% if user_registration %}
+                   <br>
+<!--                            <p class="mb-1 light-blue">{{ user_registration.university }}</p>-->
+<!--    <p class="mb-1 light-blue">{{ user_registration.work_company }}</p>-->
+    <small>{{ user_registration.emirates_office }}</small>
+       {% else %}
+        <!-- Handle the case when the user_registration is None or not found -->
+    {% endif %}
+{% endwith %}
+
                         </div>
                       </div>
                       <div class="clearfix"></div>
                      <hr />
-
-{% endfor %}
-
                   </div>
+                      {% endfor %}
             </div >
 
 
-
+        {% else %}
+         <h3 class="high-light">Currently you don't have any contacts</h3>
+         {% endif %}
+              </div>

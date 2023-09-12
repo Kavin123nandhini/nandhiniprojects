@@ -1,0 +1,57 @@
+<!--Login Modal-->
+{%load static %}
+<div id="post_job" class="modal">
+    <form class="modal-content  animate" action="{% url 'post-job' %}"
+          method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+            <span type="button" onclick="javascript:window.location.reload()" class="close" data-dismiss="modal" aria-hidden="true">&times;</span>
+<!--            <span onclick="document.getElementById('login_1').style.display='none'"-->
+<!--                  class="close" title="Close">&times;</span>-->
+            <!-- <img src="images/signin1.jpg" alt="Avatar" class="avatar"> -->
+          <h2> <a  href="{% url 'home' %}" class="sitename">
+              <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+            </a></h2>
+        </div>
+
+        <div class="modal-body ">
+
+            <div class="row  pt-3 pb-3">
+                 <div class="card ">
+                 <h1>Post a Job</h1>
+                      <label for="title">Job Title:<span class="high-light"> *</span></label>
+                      <input class="form-control"type="text" name="title" required><br>
+                     <label for="company_name">Company Name:</label>
+                      <input class="form-control"type="text" name="company_name" value="{{user_data.work_company}}"disabled><br>
+                      <label for="description">Job Description:<span class="high-light"> *</span></label>
+                      <textarea class="form-control"name="description" required></textarea><br>
+                       <label for="skills_req">Skills Required:<span class="high-light"> *</span></label>
+                      <input class="form-control"type="text" name="skills_req" required><br>
+                       <label for="job_type">Job Type:<span class="high-light"> *</span></label>
+                     <select class="form-control" id="job_type" name="job_type" required>
+                          <option selected>-- select job type--</option>
+                          <option value="Full Time">Full Time</option>
+                          <option value="Part Time">Part Time</option>
+                          <option value="Temporary">Temporary</option>
+                                              </select>
+              </div>
+                </div>
+
+
+            <div class="btnouter">
+                <div class="btndisplay">
+                    <button type="submit" class="btn red-button">Post</button>
+                </div>
+                <div class="btndisplay">
+                    <button type="button" class="btn white-button"
+                            onclick="document.getElementById('post_job').style.display='none'"
+                            class="cancelbtn">Cancel
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>

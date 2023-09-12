@@ -1,0 +1,47 @@
+{% extends 'title.html' %}
+
+{% block title %}jobs|Postman{% endblock %}
+ {%load static %}
+ {% load user_filter %}
+  {% block body %}
+{% include 'includes/alerts.html' %}
+
+
+<div class="user-section">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3></h3>
+                      <ul class="list-group list-group-flush rounded-3">
+                          <li class="list-group-item d-flex  p-3">
+                <iconify-icon icon="grommet-icons:workshop" class="icon pr3"></iconify-icon>
+                <a href="#" onclick="document.getElementById('my-jobs').style.display='block';
+document.getElementById('job-alerts').style.display='none';">My Jobs&nbsp;<small class="text-muted">({{applied_jobs.count}})</small></a>
+              </li>
+              <li class="list-group-item d-flex  p-3">
+               <iconify-icon icon="ant-design:alert-filled" class="icon pr3"></iconify-icon>
+                <a href="#"onclick="document.getElementById('job-alerts').style.display='block';
+document.getElementById('my-jobs').style.display='none';" class="mb-0" >Job alerts&nbsp;</a>
+                  <small class="text-muted">({{job_listing.count}})</small>
+              </li>
+
+            </ul>
+
+          </div>
+      </div>
+            </div>
+<!--              invitations-->
+              <div class="col-lg-9" id="job-alerts">
+                   {% include 'includes/job-alerts.html' %}
+              </div >
+               <div class="col-lg-9" id="my-jobs" style="display:none;">
+                   {% include 'includes/my-jobs.html' %}
+              </div >
+
+          </div>
+        </div>
+      </div>
+
+    {% endblock body %}

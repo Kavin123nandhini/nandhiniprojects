@@ -12,11 +12,13 @@ class Friends(models.Model):
     friend = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='friend_friendships')
     status = models.CharField(max_length=50, default='pending')
+    request_date = models.DateTimeField(auto_now_add=True)
+
 
     # Other fields related to the friendship...
 
-    def __str__(self):
-        return f"{self.user.username} -> {self.friend.username}"
+    # def __str__(self):
+    #     return f"{self.user.username} -> {self.friend.username}"
 
     def accept(self):
         self.status = 'accepted'
@@ -38,11 +40,13 @@ class Messages(models.Model):
 
 
 class JobListing(models.Model):
-    title = models.CharField(max_length=100)
-    description = models.TextField(max_length=1000)
+    title = models.CharField(max_length=100,blank=True,null=True)
+    description = models.TextField(max_length=1000,blank=True,null=True)
+    skills_req= models.CharField(max_length=500,blank=True,null=True)
+    job_type = models.CharField(max_length=100,blank=True,null=True)
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE,
                                   related_name="joblisting")
-    created_at = models.DateTimeField(auto_now_add=True)
+    posted_date = models.DateTimeField(auto_now_add=True)
 
 
 class JobAppliedUser(models.Model):
@@ -50,4 +54,6 @@ class JobAppliedUser(models.Model):
                             related_name="job")
     applied_user = models.ForeignKey(User, on_delete=models.CASCADE,
                                      related_name="applied_user")
-    remarks = models.CharField(max_length=100, default="hold")
+    remarks = models.CharField(max_length=100, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+    submit_resume=models.FileField(upload_to="resume/",blank=True,null=True)

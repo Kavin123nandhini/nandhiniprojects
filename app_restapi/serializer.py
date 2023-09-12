@@ -34,7 +34,7 @@ class userSerializer(serializers.ModelSerializer):
         model = UserRegistration
         fields = ['phonenumber','user_role','emirates_id','user_role','emirates_office'
                   ,'qualification','university','year_passed_out','skills','exp_years'
-                  ,'designation','work_company','total_employees','auth_name','user','about_company']
+                  ,'designation','work_company','employee_count','auth_name','user','about_company','industry_type']
 
     def create(self, validated_data):
         # print(validated_data.pop('user'))

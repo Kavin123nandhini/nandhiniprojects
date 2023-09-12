@@ -27,8 +27,9 @@ class UserRegistration(models.Model):
     designation = models.CharField(max_length=30, blank=True, null=True)
     work_company = models.CharField(max_length=30, blank=True, null=True)
     about_company = models.TextField(max_length=1000, null=True, blank=True)
-    total_employees = models.CharField(max_length=30, blank=True,
+    employee_count = models.CharField(max_length=30, blank=True,
                                        null=True)
+    industry_type=models.CharField(max_length=100, null=True, blank=True)
     auth_name = models.CharField(max_length=30, blank=True,
                                  null=True)
     date_of_registration = models.DateTimeField(auto_now_add=True, null=True,

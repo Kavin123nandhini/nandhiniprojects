@@ -66,6 +66,7 @@ def user_register(request):
         employee_count = request.POST.get("employee_count")
         auth_name = request.POST.get("auth_name")
         about_company=request.POST.get("about_company")
+        industry_type=request.POST.get("industry_type")
         print("emirates_id", emirates_id)
         user = {
             "first_name": first_name,
@@ -91,6 +92,7 @@ def user_register(request):
             "employee_count": employee_count,
             "auth_name": auth_name,
             "about_company":about_company,
+            "industry_type":industry_type,
         }
         if User.objects.filter(email=email).exists():
             messages.error(request,

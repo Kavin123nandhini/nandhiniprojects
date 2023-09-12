@@ -1,0 +1,38 @@
+ {% load user_filter %}
+
+
+
+
+<div class="card">
+     <div class="card-body ">
+         {% if job_listing %}
+          <h3>Recommended for you</h3>
+                    <p class="light-blue">Based on your profile and search history</p>
+
+ <div class="list-group">
+
+     {% for job in job_listing%}
+  <a href="{% url 'view-job' job.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between">
+      <h4 class=" job-title mb-1">{{job.title}}</h4>
+      <small class="light-blue">{{job.created_at}}</small>
+    </div>
+        {% with user_registration=job.posted_by|user_profile %}
+    {% if user_registration %}
+                   <br>
+    <p class="mb-1 light-blue">{{ user_registration.work_company }}</p>
+    <small>{{ user_registration.emirates_office }}</small>
+       {% else %}
+        <!-- Handle the case when the user_registration is None or not found -->
+    {% endif %}
+{% endwith %}
+  </a>
+      {% endfor %}
+
+
+ </div>
+          {% else %}
+         <h3>Currently you don't have any recommendations</h3>
+         {% endif %}
+     </div>
+</div>

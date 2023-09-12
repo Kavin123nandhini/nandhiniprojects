@@ -22,12 +22,21 @@ def user_profile(user):
 
 
 @register.filter
-def user_company(obj, user):
+def user_company(user):
     try:
         obj = UserRegistration.objects.get(user=user)
     except UserRegistration.DoesNotExist:
         obj = None
     return obj.work_company
+
+
+@register.filter
+def user_remark(obj, user):
+    try:
+        obj = JobAppliedUser.objects.get(user=user)
+    except JobAppliedUser.DoesNotExist:
+        obj = None
+    return obj.remarks
 
 # @register.filter
 # def check_approval(user_id, course_id):

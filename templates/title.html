@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 {%load static %}
+{% load user_filter %}
 <head>
     <meta charset="utf-8">
      <link rel="icon" href="{% static 'img/red_logo.png' %}" type="image/x-icon">
@@ -49,13 +50,119 @@
     </div>
 </div>
 <!-- Spinner End -->
-
-    <nav class="navbar navbar-expand-lg  notranslate navbar-light">
+<nav class="navbar navbar-expand-lg  notranslate navbar-light">
         <div class="container">
-             <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand" href="#">
 
-                <h1>  <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan</h1>
+                <h1> <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan</h1>
             </a>
+
+            <button aria-controls='offcanvasExample'
+                    class='btn btn-danger navbar-toggler border-3 px-2' data-bs-target='#offcanvasExample'
+                    data-bs-toggle='offcanvas'
+                    type='button'>
+                <div class="container">
+                    <div class="menu-bar"></div>
+                    <div class="menu-bar"></div>
+                    <div class="menu-bar"></div>
+                </div>
+
+            </button>
+            <div aria-labelledby='offcanvasExampleLabel' class='offcanvas offcanvas-end '
+                 id='offcanvasExample'
+                 tabindex='-1'>
+                <div class='offcanvas-header d-flex d-lg-none'>
+                    <a class="sitename offcanvas-title"
+                       href="#"
+                       id='offcanvasExampleLabel'>
+                        <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+                    </a>
+                    <a aria-label='close'
+                       class='text-reset p-0'
+                       data-bs-dismiss='offcanvas'
+                       href='javascript:void(0) '
+                    >
+                        <svg class='bi bi-x-circle'
+                             fill='#f7444e'
+                             height='24'
+                             viewBox='0 0 16 16'
+                             width='24'
+                             xmlns='http://www.w3.org/2000/svg'
+                        >
+                            <path d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/>
+                            <path d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/>
+                        </svg>
+                    </a>
+                </div>
+                <div class='offcanvas-body p-lg-0'>
+                    <!-- desktop view -->
+
+                    <div class="navbar-nav ms-auto ">
+
+                        {% if 'logged_in' in request.session %}
+
+                        <a class=" nav-item nav-link" href="{% url 'feed' %}" id="home-link">
+                           <iconify-icon icon="oi:home"class="icon"></iconify-icon>Home</a>
+                         <a class=" nav-item nav-link" href="{% url 'my-network' %}">
+                         <iconify-icon icon="pepicons-print:people-circle" class="icon"></iconify-icon>My Network</a>
+                        <a class=" nav-item nav-link" href="{% url 'feed' %}">
+                           <iconify-icon icon="ic:baseline-notifications-active"class="icon"></iconify-icon>Notification</a>
+                         {% if user_data.user_role == 'Fresher' or user_data.user_role == 'Experienced' %}
+                         <a class=" nav-item nav-link" href="{% url 'jobs-page' %}">
+                           <iconify-icon icon="mdi:post-it-note-search-outline" class="icon"></iconify-icon>Jobs</a>
+
+                        {% endif %}
+
+                        <input hidden
+                               id="username"
+                               type="text" value="{{ request.session.username}}">
+                        <div class="nav-item mt-2 dropdown">
+
+                            <a class="nav-link " data-bs-toggle="dropdown"
+                               href="#">
+                            <div class="circle">
+                                <span class="proimage"
+                                      id="profileImage"> </span>
+                            </div>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="#"
+                                   title="PROFILE">
+                                    <iconify-icon class="icon"
+                                                  icon="mdi:user-circle"></iconify-icon>
+                                    {{request.session.user_email}}
+                                </a>
+
+                                <a class="dropdown-item"
+                                   href="{% url 'user-logout' %}"
+                                   title="LOGOUT">
+                                    <iconify-icon class="icon"
+                                                  icon="uiw:logout"></iconify-icon>
+                                    Log out
+                                </a>
+
+
+                            </div>
+                        </div>
+
+                        {% else %}
+
+<!--                        <a class=" nav-item nav-link" href="#"-->
+<!--                           onclick="document.getElementById('login_1').style.display='block';">Login</a>-->
+<!--                        <a class="nav-item nav-link"-->
+<!--                           href="#" onclick="document.getElementById('identify_user').style.display='block';">-->
+<!--                            Register</a>-->
+ <a class=" nav-item nav-link" href="{% url 'home' %}" >Home</a>
+                        {% endif %}
+
+
+
+                </div>
+
+            </div>
+
+        </div>
         </div>
     </nav>
     {% include 'includes/alerts.html' %}
@@ -65,10 +172,6 @@
     {% endblock body %}
 
 
-    <!-- footer -->
-    {% include 'includes/footer.html' %}
-
-    <!-- Footer End -->
 
 
     <!-- Back to Top -->
@@ -83,6 +186,15 @@
 
  <!-- Template Javascript -->
  <script src="{% static 'js/main.js' %}"></script>
+<script>
+             $(document).ready(function()
+  {
+          var initials = $('#username').val().charAt(0);
+          var profileImage = $('#profileImage').text(initials);
+          var proimage=$('.proimage').text(initials);
+
+     });
+     </script>
 
 </body>
 

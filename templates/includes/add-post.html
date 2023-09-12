@@ -1,10 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!--Login Modal-->
+{%load static %}
+<div id="post_job" class="modal">
+    <form class="modal-content  animate" action="{% url 'user-login' %}"
+          method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+            <span type="button" onclick="javascript:window.location.reload()" class="close" data-dismiss="modal" aria-hidden="true">&times;</span>
+<!--            <span onclick="document.getElementById('login_1').style.display='none'"-->
+<!--                  class="close" title="Close">&times;</span>-->
+            <!-- <img src="images/signin1.jpg" alt="Avatar" class="avatar"> -->
+          <h2> <a  href="{% url 'home' %}" class="sitename">
+              <img src="{% static 'img/red_logo.png' %}" class="icon" style="width:50px;height:50px;">PostMan
+            </a></h2>
+        </div>
 
-</body>
-</html>
+        <div class="modal-body ">
+
+            <div class="row  pt-3 pb-3">
+                  <div class="col-md-4  col-form-label">
+                     <lable for="username"> Username</lable>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="form-group ">
+                       <input type="text" placeholder="Enter email id" id="username"
+                   name="username" class="form-control textbox" required>
+                    </div>
+                  </div>
+                </div>
+            <div class="row  pt-3 pb-3">
+                   <div class="col-md-4  col-form-label">
+                     <lable for="password"> Password</lable>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="form-group">
+                       <input type="password" placeholder="Enter Password" id="password"
+                   name="password" class="form-control textbox" required>
+                    </div>
+                  </div>
+            </div>
+
+            <div class="btnouter">
+                <div class="btndisplay">
+                    <button type="submit" class="btn red-button">Login</button>
+                </div>
+                <div class="btndisplay">
+                    <button type="button" class="btn white-button"
+                            onclick="document.getElementById('login_1').style.display='none'"
+                            class="cancelbtn">Cancel
+                    </button>
+                </div>
+
+            </div>
+            <p class="text-center mt-4">Don't have account?
+            <a  href="#"  onclick="document.getElementById('signup').style.display='block';document.getElementById('login_1').style.display='none';" >Register Us</a></p>
+
+            <span class="psw">
+                <a href="#"  onclick="document.getElementById('forgot_1').style.display='block';document.getElementById('login_1').style.display='none';" >Forgot password?</a>
+            </span>
+        </div>
+
+    </form>
+</div>

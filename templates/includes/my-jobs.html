@@ -1,0 +1,23 @@
+
+ {% load user_filter %}
+<div class="card">
+    <h4>Applied jobs:</h4>
+              {% if applied_jobs %}
+
+                <div class="card-body text-center">
+                    {% for ajob in applied_jobs %}
+                      <ul class="list-group list-group-flush rounded-3">
+                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                              <p class="font-green text-capitalize">{{ajob.job.title}}</p>
+                               <p class="text-muted text-uppercase ">{{ajob.job.posted_by|user_company}}</p>
+                              <p >acceptance status:{{ ajob.remarks}}</p>
+                              <p><a href="{% url 'cancel-applied' ajob.id %}" >Cancel application</a></p>
+              </li>
+            </ul>
+
+                     {% endfor %}
+          </div>
+     {% else %}
+              <h3>No jobs applied</h3>
+              {% endif %}
+      </div>

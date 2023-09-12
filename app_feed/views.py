@@ -16,6 +16,37 @@ from .models import Friends, Messages, JobAppliedUser
 from .models import JobListing
 
 
+def jobs_page(request):
+    context = {}
+    current_user = common.get_user(request.session['user_email'])
+    applied_jobs = JobAppliedUser.objects.filter(applied_user=current_user)
+    user = UserRegistration.objects.get(user_id=current_user.id)
+    print("user:", user.skills)
+    query = 'python,sql'
+    print(type(query),query)
+    skills_set= query.split(',')
+    print(skills_set)
+    # q_object= Q(skills_req__icontains=query)
+    # print(q_object)
+    filter_query = Q()
+
+    # Iterate through skills_set and create Q objects for each skill
+    for skill in skills_set:
+        filter_query |= Q(skills_req__icontains=skill)
+    matching_skills = JobListing.objects.filter(filter_query)
+    print("mathcing skills:", matching_skills)
+    # job_listing=[{}for jobs in matching_skills]
+    # print("joblisting:",job_listing)
+    context = {
+        'job_listing': matching_skills,
+        'applied_jobs': applied_jobs,
+    }
+
+    # if not matching_skills:  # Check if there are no matching skills
+    #     context['no_matching_jobs'] = True  # Add a flag to the context
+    return render(request, 'jobs-page.html', context)
+
+
 def search_friends(request):
     if common.is_authendicated(request):
         print("search start")
@@ -55,19 +86,41 @@ def add_friend(request):
         current_user = common.get_user(request.session['user_email'])
         print("user_id:", current_user.id)
         add_id = request.GET.get('id')
-        print("add_id:", id)
+        print("add_id:", add_id)
         friend = User.objects.get(id=add_id)
+        print("Friend:", friend)
+        friend_request_exists = Friends.objects.filter(
+            friend_id=current_user.id, user_id=friend.id,
+            status="pending").exists()
+        print("friend_request_exists", friend_request_exists)
+        if friend_request_exists:
+            messages.info(request, "Please accept user invitation")
+            return redirect('my-network')
         try:
             # Check if a friendship already exists
             existing_friendship = Friends.objects.get(user=current_user,
-                                                      friend_id=add_id)
+                                                      friend=friend)
+            print("checking current user")
+
+            if existing_friendship.status == "pending":
+                messages.error(request, "Already request send")
+            elif existing_friendship.status == "accepted":
+                messages.error(request, "Already in your contact")
+            else:
+                print("user")
+
         except Friends.DoesNotExist:
             # If no existing friendship, create a new one
-            new_friendship = Friends(user=current_user, friend_id=add_id)
+            new_friendship = Friends(user=current_user, friend=friend)
             new_friendship.save()
-
+            if friend == current_user:
+                new_friendship.status = "accepted"
+                new_friendship.save()
+                messages.info(request, "Added")
+                return redirect('my-network')
             # Redirect to a page displaying the user's friends or a confirmation
             # message
+            messages.success(request, "Friend request send")
         return redirect('my-network')
     messages.error(request, "please login again")
     return redirect('home')
@@ -112,12 +165,13 @@ def accept_friend_request(request, request_id):
         # Mark the request as accepted (update the 'status' field)
         friend_request.status = 'accepted'
         friend_request.save()
-        friends = Friends.objects.create(user=current_user,
-                                         friend_id=request_id
-                                         , status="accepted")
+        Friends.objects.create(user_id=friend_request.friend_id,
+                               friend_id=current_user.id,
+                               status="accepted")
+        messages.info(request, "Request accepted")
 
         return redirect('my-network')
-    messages.error(request, "please login again")
+    messages.error(request, "Please login again")
     return redirect('home')
 
 
@@ -174,11 +228,14 @@ def post_job(request):
         if request.method == 'POST':
             title = request.POST.get('title')
             description = request.POST.get('description')
+            job_type = request.POST.get('job_type')
+            skills_req = request.POST.get('skills_req')
             posted_by = current_user
 
             # Create a new job listing
             job_listing = JobListing(title=title, description=description,
-                                     posted_by=posted_by)
+                                     posted_by=posted_by,
+                                     skills_req=skills_req, job_type=job_type)
             job_listing.save()
 
             # Redirect to a page displaying job listings or a confirmation page
@@ -186,7 +243,8 @@ def post_job(request):
             # Replace 'job_listings' with your actual job listings page URL
         posted_jobs = JobListing.objects.filter(posted_by=current_user)
         if not posted_jobs:
-            return render(request, "post-job.html")
+            messages.info(request, "You are not posting any jobs")
+            return redirect("feed")
         return render(request, "post-job.html", {'job_listing': posted_jobs})
     messages.error(request, "please login again")
     return redirect('home')
@@ -195,18 +253,19 @@ def post_job(request):
 def view_job(request, id):
     if common.is_authendicated(request):
         current_user = common.get_user(request.session['user_email'])
-        remarks=None
-        job = get_object_or_404(JobListing, id=id)
+        remarks = None
+        jobs = get_object_or_404(JobListing, id=id)
         try:
-            applied = JobAppliedUser.objects.get(job=job,applied_user=current_user)
+            applied = JobAppliedUser.objects.get(job=jobs,
+                                                 applied_user=current_user)
             print(applied.job)
             if applied:
-                remarks=applied.remarks
+                remarks = applied.remarks
             return render(request, 'view-job-decs.html',
-                          {'job': job,'remarks':remarks})
+                          {'jobs': jobs, 'remarks': remarks})
         except JobAppliedUser.DoesNotExist:
             return render(request, 'view-job-decs.html',
-                          {'job': job, 'remarks': remarks})
+                          {'jobs': jobs, 'remarks': remarks})
 
     messages.error(request, "please login again")
     return redirect('home')
@@ -222,17 +281,15 @@ def apply_job(request, id):
         applied = False
 
         if job:
-
             job_apply = JobAppliedUser.objects.create(job=job,
                                                       applied_user=current_user)
             job_apply.save()
 
-
         context = {
             'job': job,
-            }
+        }
         messages.success(request, "Job applied Sucessfully!,")
-        return redirect("view-job",id)
+        return redirect("view-job", id)
 
         # viewing applied jobs
     messages.error(request, "please login again")
@@ -245,8 +302,9 @@ def view_applied_list(request):
         my_job_listings = JobListing.objects.filter(posted_by=current_user)
         # applied_users = JobAppliedUser.objects.filter(job__in=my_job_listings)
         # Retrieve applied users for those job listings
-        applied_users = JobAppliedUser.objects.filter(Q(job__in = my_job_listings) & Q(remarks='hold'))
-
+        applied_users = JobAppliedUser.objects.filter(
+            Q(job__in=my_job_listings) & Q(remarks='pending'))
+        print("applieduser:", applied_users)
         return render(request, 'view-applied-list.html',
                       {'applied_users': applied_users})
 
@@ -273,3 +331,14 @@ def hold_result(request, id):
     applied_users.remarks = 'hold'
     applied_users.save()
     return redirect('view-applied-list')
+
+
+def cancel_applied(request,id):
+
+    applied_users = JobAppliedUser.objects.get(id=id)
+    if applied_users:
+        applied_users.delete()
+        messages.info(request,"Application successfully canceled")
+    return redirect('jobs-page')
+
+
