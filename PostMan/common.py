@@ -8,6 +8,7 @@ import requests as req2
 import json
 
 register_api_url = "http://127.0.0.1:8000/app-restapi/user-register-api/"
+user_create_api= "http://127.0.0.1:8000/app-restapi/user-create-api/"
 login_api_url = "http://127.0.0.1:8000/app-restapi/create-token-api/"
 get_access_token_url = "http://127.0.0.1:8000/app-restapi/gettoken/refresh/"
 

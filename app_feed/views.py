@@ -17,26 +17,19 @@ from .models import JobListing
 
 
 def jobs_page(request):
-    context = {}
-    current_user = common.get_user(request.session['user_email'])
+    current_user = request.user
     applied_jobs = JobAppliedUser.objects.filter(applied_user=current_user)
     user = UserRegistration.objects.get(user_id=current_user.id)
-    print("user:", user.skills)
     query = 'python,sql'
-    print(type(query),query)
+
     skills_set= query.split(',')
-    print(skills_set)
-    # q_object= Q(skills_req__icontains=query)
-    # print(q_object)
+
     filter_query = Q()
 
     # Iterate through skills_set and create Q objects for each skill
     for skill in skills_set:
         filter_query |= Q(skills_req__icontains=skill)
     matching_skills = JobListing.objects.filter(filter_query)
-    print("mathcing skills:", matching_skills)
-    # job_listing=[{}for jobs in matching_skills]
-    # print("joblisting:",job_listing)
     context = {
         'job_listing': matching_skills,
         'applied_jobs': applied_jobs,
@@ -48,7 +41,7 @@ def jobs_page(request):
 
 
 def search_friends(request):
-    if common.is_authendicated(request):
+    if request.user.is_authenticated:
         print("search start")
         if request.method == 'GET':
             query = request.GET.get('formData')
@@ -82,8 +75,8 @@ def search_friends(request):
 
 
 def add_friend(request):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
         print("user_id:", current_user.id)
         add_id = request.GET.get('id')
         print("add_id:", add_id)
@@ -158,8 +151,8 @@ def add_friend(request):
 
 
 def accept_friend_request(request, request_id):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
         friend_request = get_object_or_404(Friends, id=request_id)
 
         # Mark the request as accepted (update the 'status' field)
@@ -186,15 +179,12 @@ def reject_friend_request(request, request_id):
 
 
 def send_message(request):
-    current_user = common.get_user(request.session['user_email'])
-    print("send message")
-    contex = {}
+    current_user = request.user
     if request.method == 'POST':
         post = request.POST.get("user-post")
 
         is_public = request.POST.get(
             'is_public') == 'on'  # if checked means return on
-        print(post, is_public)
         sender1 = current_user
         if is_public:
             all_users = User.objects.all()
@@ -204,11 +194,8 @@ def send_message(request):
                 message.save()
 
         else:
-            # friends = Friends.objects.filter(user_id=sender)
-            # print(friends)
             friends = Friends.objects.filter(user=current_user,
                                              status='accepted')
-            print(friends)
             # Create and save a message for each friend
             if friends.exists():
                 for friend in friends:
@@ -218,13 +205,12 @@ def send_message(request):
             else:
                 messages.error(request,
                                'Currently Your have any friends.Please add friends!')
-
     return redirect('feed')
 
 
 def post_job(request):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
         if request.method == 'POST':
             title = request.POST.get('title')
             description = request.POST.get('description')
@@ -251,14 +237,13 @@ def post_job(request):
 
 
 def view_job(request, id):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
         remarks = None
         jobs = get_object_or_404(JobListing, id=id)
         try:
             applied = JobAppliedUser.objects.get(job=jobs,
                                                  applied_user=current_user)
-            print(applied.job)
             if applied:
                 remarks = applied.remarks
             return render(request, 'view-job-decs.html',
@@ -274,8 +259,8 @@ def view_job(request, id):
 def apply_job(request, id):
     # view and apply for the job
     context = {}
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
 
         job = get_object_or_404(JobListing, id=id)
         applied = False
@@ -297,14 +282,13 @@ def apply_job(request, id):
 
 
 def view_applied_list(request):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
         my_job_listings = JobListing.objects.filter(posted_by=current_user)
         # applied_users = JobAppliedUser.objects.filter(job__in=my_job_listings)
         # Retrieve applied users for those job listings
         applied_users = JobAppliedUser.objects.filter(
             Q(job__in=my_job_listings) & Q(remarks='pending'))
-        print("applieduser:", applied_users)
         return render(request, 'view-applied-list.html',
                       {'applied_users': applied_users})
 
@@ -334,7 +318,6 @@ def hold_result(request, id):
 
 
 def cancel_applied(request,id):
-
     applied_users = JobAppliedUser.objects.get(id=id)
     if applied_users:
         applied_users.delete()

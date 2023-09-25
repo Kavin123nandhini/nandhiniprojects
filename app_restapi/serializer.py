@@ -18,7 +18,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'first_name', 'last_name']
+        fields = ['id','email', 'username', 'password', 'first_name', 'last_name']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -28,25 +28,25 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class userSerializer(serializers.ModelSerializer):
-    user = CreateUserSerializer(required=True)
+    # user = CreateUserSerializer(required=True)
 
     class Meta:
         model = UserRegistration
-        fields = ['phonenumber','user_role','emirates_id','user_role','emirates_office'
+        fields = ['phonenumber','user_role','emirates_id','emirates_office','gender'
                   ,'qualification','university','year_passed_out','skills','exp_years'
                   ,'designation','work_company','employee_count','auth_name','user','about_company','industry_type']
 
-    def create(self, validated_data):
-        # print(validated_data.pop('user'))
-        user_data = validated_data.pop('user')
-        print(user_data)
-        user = CreateUserSerializer.create(CreateUserSerializer(),
-                                           validated_data=user_data)
-        print(user.id)
-        print()
-        user_register, created = UserRegistration.objects.update_or_create(
-            user=user, **validated_data)
-        return user_register
+    # def create(self, validated_data):
+    #     # print(validated_data.pop('user'))
+    #     user_data = validated_data.pop('user')
+    #     print(user_data)
+    #     user = CreateUserSerializer.create(CreateUserSerializer(),
+    #                                        validated_data=user_data)
+    #     print(user.id)
+    #     print()
+    #     user_register, created = UserRegistration.objects.update_or_create(
+    #         user=user, **validated_data)
+    #     return user_register
 
 
 

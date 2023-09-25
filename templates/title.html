@@ -99,7 +99,7 @@
 
                     <div class="navbar-nav ms-auto ">
 
-                        {% if 'logged_in' in request.session %}
+                        {% if user.is_authenticated %}
 
                         <a class=" nav-item nav-link" href="{% url 'feed' %}" id="home-link">
                            <iconify-icon icon="oi:home"class="icon"></iconify-icon>Home</a>
@@ -115,7 +115,7 @@
 
                         <input hidden
                                id="username"
-                               type="text" value="{{ request.session.username}}">
+                               type="text" value="{{ user.username}}">
                         <div class="nav-item mt-2 dropdown">
 
                             <a class="nav-link " data-bs-toggle="dropdown"
@@ -131,7 +131,7 @@
                                    title="PROFILE">
                                     <iconify-icon class="icon"
                                                   icon="mdi:user-circle"></iconify-icon>
-                                    {{request.session.user_email}}
+                                    {{user.email}}
                                 </a>
 
                                 <a class="dropdown-item"

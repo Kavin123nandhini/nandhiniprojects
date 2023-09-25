@@ -2,14 +2,12 @@ from datetime import datetime, timezone, timedelta
 
 import requests as req1
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
-from app_restapi.models import UserRegistration, User
+from app_restapi.models import UserRegistration
 from app_feed.models import Friends, Messages, JobListing
-from PostMan import common
-from django.db.models import Q
-# from .forms import ContactForm
+from django.contrib.auth.models import User
 # Verification email
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -21,11 +19,10 @@ from django.core.mail import EmailMessage
 
 # Create your views here.
 def home(request):
-    if common.is_authendicated(request):
-        user = common.get_user(request.session['user_email'])
-        print("user_id:", user.id)
-        request.session['username'] = user.first_name
-    return render(request, "home.html")
+    if request.user.is_authenticated:
+        request.session['username'] = request.user.first_name
+        return render(request,"home.html",{'user': request.user})
+    return render(request, "home.html",)
 
 
 # user registration page request
@@ -36,7 +33,6 @@ def register_link(request):
 def user_role(request):
     if request.method == 'POST':
         role = request.POST.get('user_role')
-    print(role)
     return render(request, "signup.html", {'user_role': role})
 
 
@@ -44,8 +40,6 @@ def user_role(request):
 def user_register(request):
     context = {}
     print("user register")
-    # assign registration api url to var url
-    url = common.register_api_url
     if request.method == 'POST':
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
@@ -65,112 +59,84 @@ def user_register(request):
         skills = request.POST.get("skills")
         employee_count = request.POST.get("employee_count")
         auth_name = request.POST.get("auth_name")
-        about_company=request.POST.get("about_company")
-        industry_type=request.POST.get("industry_type")
+        about_company = request.POST.get("about_company")
+        industry_type = request.POST.get("industry_type")
         print("emirates_id", emirates_id)
-        user = {
+        if UserRegistration.objects.filter(emirates_id=emirates_id).exists():
+            messages.error(request,
+                           'Your emirates_id already exists!')
+            return redirect('home')
+
+        user_data = {
             "first_name": first_name,
             "last_name": last_name,
             "username": email,
             "email": email,
             "password": password,
         }
-        context = {
-            "phonenumber": phonenumber,
-            "user": user,
-            "emirates_id": emirates_id,
-            "gender": gender,
-            "qualification": qualification,
-            "emirates_office": emirates_name,
-            "user_role": role,
-            "exp_years": work_exp_years,
-            "designation": designation,
-            "work_company": work_company,
-            "university": university,
-            "year_passed_out": passed_year,
-            "skills": skills,
-            "employee_count": employee_count,
-            "auth_name": auth_name,
-            "about_company":about_company,
-            "industry_type":industry_type,
-        }
-        if User.objects.filter(email=email).exists():
-            messages.error(request,
-                           'Your e-mail address already exists!')
-            return redirect('home')
-        if UserRegistration.objects.filter(emirates_id=emirates_id).exists():
-            messages.error(request,
-                           'Your emirates_id already exists!')
-            return redirect('home')
-
-        # or user conflict status code 409
-        # passing user nested dict details and getting response
         try:
-            res1 = req1.post(url, json=context)
-            print(res1.content)
-            print(res1, url, context)
-            if res1.status_code in range(200, 299):
+            user_instance = User.objects.create_user(**user_data)
+            context = {
+                "phonenumber": phonenumber,
+                "user": user_instance,
+                "emirates_id": emirates_id,
+                "gender": gender,
+                "qualification": qualification,
+                "emirates_office": emirates_name,
+                "user_role": role,
+                "exp_years": work_exp_years,
+                "designation": designation,
+                "work_company": work_company,
+                "university": university,
+                "year_passed_out": passed_year,
+                "skills": skills,
+                "employee_count": employee_count,
+                "auth_name": auth_name,
+                "about_company": about_company,
+                "industry_type": industry_type,
+            }
+
+            # or user conflict status code 409
+            # passing user nested dict details and getting response
+            try:
+                reg_instance = UserRegistration.objects.create(**context)
                 messages.success(request,
                                  'Registered successfully!Please login '
                                  'PostMan!')
                 return redirect('home')
 
-            else:
-                messages.error(request,
-                               'Api response failed!')
-                return redirect('home')
-        except req1.exceptions.RequestException as e:
-            raise SystemExit(e)
+            except Exception as e:
+                print(f"An error occurred for user registration: {e}")
+        except Exception as e:
+            print(f"user table not found: {e}")
 
-    return redirect("register_link")
+    return redirect("register-link")
 
 
 def user_login(request):
-    context = {}
-    url = common.login_api_url
     if request.method == 'POST':
         username = request.POST.get("username")
         password = request.POST.get("password")
-        print(username, password)
-        context = {
-            "username": username,
-            "password": password
-        }
-        print(context)
-        try:
-            res1 = req1.post(url, context)
-            print(res1)
-            if res1.json().get("access", ""):
-                access_token = res1.json()["access"];
-                refresh_token = res1.json()["refresh"]
-                try:
-                    request.session['user_email'] = username
-                    request.session['access_token'] = access_token
-                    request.session['refresh_token'] = refresh_token
-                    request.session['logged_in'] = True
-                    # messages.success(request, 'Login Successfully!')
-                    # print(request.user.email)
-
-                    return redirect('feed')
-                except KeyError:
-                    messages.error(request,
-                                   'Your session time out please login '
-                                   'again!')
-                    return redirect('home')
+        print(username,password)
+        user = authenticate(username=username, password=password)
+        print(user)
+        if user:
+            # Check it the account is active
+            if user.is_active:
+                login(request, user)
+                return redirect('feed')
             else:
                 messages.error(request, 'username or password incorrect !')
-            return redirect('home')
-        except req1.exceptions.RequestException as e:
+        else:
             messages.error(request, 'User not found !')
-            raise SystemExit(e)
     return render(request, "home.html")
 
 
+@login_required
 def user_logout(request):
     try:
-        print("logging out")
+        logout(request)
         messages.info(request, 'You are logging out!')
-        request.session.flush()
     except KeyError:
         pass
     return redirect('home')
@@ -214,7 +180,7 @@ def resetpassword_validate(request, uidb64, token):
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
-        request.session['uid'] = uid
+        # request.session['uid'] = uid
         messages.success(request, 'Please reset your password')
         return redirect('reset-password')
     else:
@@ -228,7 +194,7 @@ def reset_password(request):
         confirm_password = request.POST['confirm_password']
 
         if password == confirm_password:
-            uid = request.session.get('uid')
+            id = request.user
             user = User.objects.get(pk=uid)
             user.set_password(password)
             user.save()
@@ -242,20 +208,22 @@ def reset_password(request):
 
 
 def after_login_page(request):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
+    if request.user.is_authenticated:
+        current_user = request.user
         post_message = Messages.objects.filter(receiver=current_user)
         job_listing = JobListing.objects.all()
-        print("messages",post_message)
-        return render(request, 'after-login-page.html',{'post_message':post_message,'job_listing':job_listing})
-    messages.error(request,"please login again")
+        print("messages", post_message)
+        return render(request, 'after-login-page.html',
+                      {'post_message': post_message,
+                       'job_listing': job_listing,'user': request.user})
+    messages.error(request, "please login again")
     return redirect('home')
 
 
 def my_network(request):
-    if common.is_authendicated(request):
-        current_user = common.get_user(request.session['user_email'])
-        context={}
+    if request.user.is_authenticated:
+        current_user = request.user
+        context = {}
         # Retrieve pending friend requests (assuming 'pending' is the status for
         # pending requests)
         friend_requests = Friends.objects.filter(friend=current_user,
@@ -265,11 +233,9 @@ def my_network(request):
         print("friends", friends)
         contex = {
             'friend_requests': friend_requests,
-            'friends' : friends,
+            'friends': friends,
         }
         # Render a template and pass the 'friend_requests' queryset to it
-        return render(request, 'my-network.html',contex)
-    messages.error(request,"please login again")
+        return render(request, 'my-network.html', contex)
+    messages.error(request, "please login again")
     return redirect("home")
-
-

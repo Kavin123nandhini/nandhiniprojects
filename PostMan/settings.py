@@ -15,6 +15,7 @@ import os
 from datetime import timedelta
 from django.conf import settings
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +44,9 @@ INSTALLED_APPS = [
     'app_authuser',
     'app_restapi',
     'app_feed',
+    'rest_framework',
+    'rest_framework_simplejwt',
+
 ]
 
 MIDDLEWARE = [
@@ -54,8 +58,18 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 ROOT_URLCONF = 'PostMan.urls'
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    # ...
+]
 
 TEMPLATES = [
     {

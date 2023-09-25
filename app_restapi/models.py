@@ -12,13 +12,12 @@ class UserRegistration(models.Model):
                                    default=uuid.uuid4)
     emirates_id = models.CharField(max_length=200,
                                    unique=True)
-    user = models.ForeignKey(User, related_name='user'
+    user = models.OneToOneField(User, related_name='user'
                              , on_delete=models.CASCADE)
     user_role = models.CharField(null=True, max_length=30)
     emirates_office = models.CharField(null=True, max_length=30)
-    phonenumber = models.CharField(max_length=30, validators=[
-        numeric])
-
+    phonenumber = models.CharField(max_length=30)
+    gender=models.CharField(max_length=30,null=True,blank=True)
     qualification = models.CharField(max_length=30, null=True, blank=True)
     university = models.CharField(max_length=30, blank=True, null=True)
     year_passed_out = models.CharField(max_length=30, blank=True, null=True)

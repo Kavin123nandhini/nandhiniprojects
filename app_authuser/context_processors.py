@@ -6,9 +6,9 @@ from PostMan import common
 
 def user_data_links(request):
     context={}
-    if common.is_authendicated(request):
+    if request.user.is_authenticated:
         users = UserRegistration.objects.all()
-        user = common.get_user(request.session['user_email'])
+        user = request.user
         print("user_id:", user.id)
         request.session['username'] = user.first_name
         try:
